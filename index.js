@@ -1,5 +1,5 @@
 const express = require('express');
-const {Server} = require('socket.io');
+const { Server } = require('socket.io');
 const helmet = require('helmet');
 const http = require('http');
 const cors = require('cors');
@@ -12,7 +12,7 @@ require('./database/connection')();
 const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(helmet({
     crossOriginResourcePolicy: false,
 }));
@@ -20,15 +20,27 @@ app.use(cors());
 app.use(express.static('public'));
 
 const dir = 'public/uploads';
-if (!fs.existsSync(dir)){
+if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
 }
 
 // Routes
 const routes = require('./Routes/index');
-app.use('/api',routes);
+app.use('/api', routes);
 
-app.get('/', (req, res)=> res.send('Working'))
+app.get('/', (req, res) => res.send('Working'))
 
-const PORT  = process.env.PORT || 3000;
-app.listen(PORT,()=> console.log(`Node App Running at http://localhost:${PORT}`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Node App Running at http://localhost:${PORT}`));
+
+app.get('/debug-chromium', (req, res) => {
+    const fs = require('fs');
+    const paths = [
+        '/usr/bin/chromium',
+        '/usr/bin/chromium-browser',
+        '/usr/bin/google-chrome',
+        '/usr/bin/google-chrome-stable',
+    ];
+    const found = paths.filter(p => fs.existsSync(p));
+    res.json({ found });
+});
